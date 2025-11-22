@@ -67,6 +67,12 @@ namespace UIFramework.Configuration
             MaxPoolSize = Mathf.Max(DefaultPoolSize, MaxPoolSize);
             MaxCachedViews = Mathf.Max(0, MaxCachedViews);
             DefaultTransitionDuration = Mathf.Max(0.01f, DefaultTransitionDuration);
+
+            // Warn if Canvas not assigned
+            //if (UICanvas == null)
+            //{
+            //    Debug.LogWarning("[UIFrameworkConfig] UICanvas is not assigned! UI views won't be able to render. Assign a Canvas in the inspector.", this);
+            //}
         }
 
         #endregion

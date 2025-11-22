@@ -23,15 +23,21 @@ namespace UIFramework.Core
         /// </summary>
         /// <param name="uiLoader">The UI loader for loading prefabs.</param>
         /// <param name="container">The VContainer resolver for dependency injection.</param>
-        public UIViewFactory(IUILoader uiLoader, IObjectResolver container)
+        /// <param name="uiCanvas">The Canvas where UI views will be instantiated.</param>
+        public UIViewFactory(IUILoader uiLoader, IObjectResolver container, Canvas uiCanvas)
         {
             _uiLoader = uiLoader ?? throw new ArgumentNullException(nameof(uiLoader));
             _container = container ?? throw new ArgumentNullException(nameof(container));
 
-            // Create root transform for UI views
-            var rootGo = new GameObject("[UI Views]");
-            UnityEngine.Object.DontDestroyOnLoad(rootGo);
-            _rootTransform = rootGo.transform;
+            if (uiCanvas == null)
+            {
+                throw new ArgumentNullException(nameof(uiCanvas),
+                    "UI Canvas is not assigned! " +
+                    "Please assign the Canvas in UIFrameworkInstaller inspector.");
+            }
+
+            _rootTransform = uiCanvas.transform;
+            Debug.Log($"[UIViewFactory] Using Canvas: {uiCanvas.name}");
         }
 
         public async Task<TView> CreateAsync<TView, TViewModel>(

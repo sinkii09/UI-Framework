@@ -13,10 +13,12 @@ namespace UIFramework.Editor
     public class UIFrameworkInstallerEditor : UnityEditor.Editor
     {
         private SerializedProperty _configProperty;
+        private SerializedProperty _uiCanvasProperty;
 
         private void OnEnable()
         {
             _configProperty = serializedObject.FindProperty("config");
+            _uiCanvasProperty = serializedObject.FindProperty("uiCanvas");
         }
 
         public override void OnInspectorGUI()
@@ -50,6 +52,16 @@ namespace UIFramework.Editor
                     Selection.activeObject = config;
                     EditorGUIUtility.PingObject(config);
                 }
+            }
+
+            EditorGUILayout.Space(10);
+
+            // UI Canvas
+            EditorGUILayout.PropertyField(_uiCanvasProperty, new GUIContent("UI Canvas"));
+
+            if (_uiCanvasProperty.objectReferenceValue == null)
+            {
+                EditorGUILayout.HelpBox("UI Canvas not assigned! Assign a Canvas from your scene.", MessageType.Error);
             }
 
             EditorGUILayout.Space(10);

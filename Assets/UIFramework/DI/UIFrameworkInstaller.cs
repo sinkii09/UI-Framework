@@ -17,12 +17,19 @@ namespace UIFramework.DI
     public class UIFrameworkInstaller : LifetimeScope
     {
         [SerializeField] private UIFrameworkConfig config;
+        [SerializeField] private Canvas uiCanvas;
 
         protected override void Configure(IContainerBuilder builder)
         {
             if (config == null)
             {
                 Debug.LogError("[UIFrameworkInstaller] UIFrameworkConfig is not assigned!");
+                return;
+            }
+
+            if (uiCanvas == null)
+            {
+                Debug.LogError("[UIFrameworkInstaller] UI Canvas is not assigned! Assign a Canvas in the inspector.");
                 return;
             }
 
@@ -89,8 +96,9 @@ namespace UIFramework.DI
             // Event bus - singleton
             builder.Register<UIEventBus>(Lifetime.Singleton);
 
-            // View factory - singleton
-            builder.Register<IUIViewFactory, UIViewFactory>(Lifetime.Singleton);
+            // View factory - singleton (pass Canvas reference from installer)
+            builder.Register<IUIViewFactory, UIViewFactory>(Lifetime.Singleton)
+                .WithParameter(uiCanvas);
         }
 
         private void RegisterNavigationServices(IContainerBuilder builder)
