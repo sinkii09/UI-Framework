@@ -5,7 +5,8 @@
         "Unity.TextMeshPro",
         "DOTween.Modules",
         "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "VContainer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
