@@ -2,6 +2,7 @@ using UIFramework.Core;
 using UIFramework.MVVM;
 using UIFramework.Events;
 using UIFramework.Navigation;
+using System.Threading.Tasks;
 
 namespace UIFramework.Examples
 {
@@ -36,10 +37,10 @@ namespace UIFramework.Examples
 
             // Initialize commands
             PlayCommand = new ReactiveCommand();
-            PlayCommand.Subscribe(OnPlayClicked).AddTo(Disposables);
+            PlayCommand.Subscribe(() => OnPlayClickedAsync()).AddTo(Disposables);
 
             SettingsCommand = new ReactiveCommand();
-            SettingsCommand.Subscribe(OnSettingsClicked).AddTo(Disposables);
+            SettingsCommand.Subscribe(() => OnSettingsClickedAsync()).AddTo(Disposables);
 
             QuitCommand = new ReactiveCommand();
             QuitCommand.Subscribe(OnQuitClicked).AddTo(Disposables);
@@ -68,7 +69,7 @@ namespace UIFramework.Examples
             Level.Value = 42;
         }
 
-        private void OnPlayClicked()
+        private async void OnPlayClickedAsync()
         {
             UnityEngine.Debug.Log("[MainMenuViewModel] Play button clicked!");
 
@@ -80,15 +81,15 @@ namespace UIFramework.Examples
             });
 
             // Navigate to gameplay (example - would need GameplayView/ViewModel)
-            // await _navigator.ChangeStateAsync("Gameplay");
+            await _navigator.ChangeStateAsync("Gameplay");
         }
 
-        private async void OnSettingsClicked()
+        private async Task OnSettingsClickedAsync()
         {
             UnityEngine.Debug.Log("[MainMenuViewModel] Settings button clicked!");
 
             // Navigate to settings (example - would need SettingsView/ViewModel)
-            // await _navigator.PushAsync<SettingsView, SettingsViewModel>();
+            await _navigator.PushAsync<PopupView, PopupViewModel>();
         }
 
         private void OnQuitClicked()
