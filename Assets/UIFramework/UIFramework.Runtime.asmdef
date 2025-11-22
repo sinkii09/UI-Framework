@@ -3,6 +3,7 @@
     "rootNamespace": "UIFramework",
     "references": [
         "Unity.TextMeshPro",
+        "DOTween.Modules",
         "Unity.Addressables",
         "Unity.ResourceManager"
     ],
