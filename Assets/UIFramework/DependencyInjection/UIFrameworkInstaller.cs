@@ -5,6 +5,7 @@ using UIFramework.Animation;
 using UIFramework.Core;
 using UIFramework.Events;
 using UIFramework.Navigation;
+using UIFramework.Configuration;
 
 namespace UIFramework.DependencyInjection
 {

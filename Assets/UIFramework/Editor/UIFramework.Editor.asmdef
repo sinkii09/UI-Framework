@@ -2,7 +2,9 @@
     "name": "UIFramework.Editor",
     "rootNamespace": "UIFramework.Editor",
     "references": [
-        "UIFramework.Runtime"
+        "UIFramework.Runtime",
+        "VContainer",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

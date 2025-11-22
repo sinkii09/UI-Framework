@@ -1,7 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-namespace UIFramework.DependencyInjection
+namespace UIFramework.Configuration
 {
     /// <summary>
     /// Main configuration for the UIFramework.
@@ -41,6 +41,10 @@ namespace UIFramework.DependencyInjection
         [Range(1, 50)]
         public int DefaultPoolSize = 5;
 
+        [Tooltip("Maximum pool size before objects are destroyed instead of pooled.")]
+        [Range(5, 100)]
+        public int MaxPoolSize = 20;
+
         [Header("Performance")]
         [Tooltip("Cache inactive views instead of destroying them.")]
         public bool EnableViewCaching = true;
@@ -60,6 +64,7 @@ namespace UIFramework.DependencyInjection
             // Ensure sensible values
             MaxNavigationStackDepth = Mathf.Max(1, MaxNavigationStackDepth);
             DefaultPoolSize = Mathf.Max(1, DefaultPoolSize);
+            MaxPoolSize = Mathf.Max(DefaultPoolSize, MaxPoolSize);
             MaxCachedViews = Mathf.Max(0, MaxCachedViews);
             DefaultTransitionDuration = Mathf.Max(0.01f, DefaultTransitionDuration);
         }

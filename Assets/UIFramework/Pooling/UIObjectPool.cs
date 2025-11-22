@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
 using UIFramework.Core;
+using UIFramework.Configuration;
 
 namespace UIFramework.Pooling
 {
@@ -34,7 +35,7 @@ namespace UIFramework.Pooling
         /// </summary>
         /// <param name="uiLoader">The UI loader for loading prefabs.</param>
         /// <param name="config">Framework configuration (optional).</param>
-        public UIObjectPool(IUILoader uiLoader, UIFramework.DependencyInjection.UIFrameworkConfig config = null)
+        public UIObjectPool(IUILoader uiLoader, UIFrameworkConfig config = null)
         {
             _uiLoader = uiLoader ?? throw new ArgumentNullException(nameof(uiLoader));
 

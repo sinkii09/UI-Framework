@@ -5,11 +5,72 @@ using UIFramework.MVVM;
 namespace UIFramework.Core
 {
     /// <summary>
-    /// Base class for all UI Views implementing the MVVM pattern.
+    /// Non-generic base class for all UI Views.
+    /// Allows editor scripts to reference views without knowing the generic type parameter.
+    /// </summary>
+    public abstract class UIViewBase : MonoBehaviour, IUIView
+    {
+        /// <summary>
+        /// The CanvasGroup component (added automatically if not present).
+        /// </summary>
+        [SerializeField] protected CanvasGroup canvasGroup;
+
+        #region IUIView Implementation
+
+        public GameObject GameObject => gameObject;
+        public Transform Transform => transform;
+        public RectTransform RectTransform => transform as RectTransform;
+
+        #endregion
+
+        /// <summary>
+        /// Shows the View to the user.
+        /// </summary>
+        public virtual void Show()
+        {
+            gameObject.SetActive(true);
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1f;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
+            }
+        }
+
+        /// <summary>
+        /// Hides the View from the user.
+        /// </summary>
+        public virtual void Hide()
+        {
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 0f;
+                canvasGroup.interactable = false;
+                canvasGroup.blocksRaycasts = false;
+            }
+
+            gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Destroys the View.
+        /// </summary>
+        public virtual void Destroy()
+        {
+            if (gameObject != null)
+            {
+                UnityEngine.Object.Destroy(gameObject);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Generic base class for all UI Views implementing the MVVM pattern.
     /// Views are responsible for visual presentation only - no business logic.
     /// </summary>
     /// <typeparam name="TViewModel">The ViewModel type for this View.</typeparam>
-    public abstract class UIView<TViewModel> : MonoBehaviour, IUIView where TViewModel : IViewModel
+    public abstract class UIView<TViewModel> : UIViewBase where TViewModel : IViewModel
     {
         /// <summary>
         /// The ViewModel bound to this View.
@@ -22,22 +83,9 @@ namespace UIFramework.Core
         protected PropertyBinder Binder { get; private set; }
 
         /// <summary>
-        /// The CanvasGroup component (added automatically if not present).
-        /// </summary>
-        [SerializeField] protected CanvasGroup canvasGroup;
-
-        /// <summary>
         /// Whether this View has been initialized.
         /// </summary>
         protected bool IsInitialized { get; private set; }
-
-        #region IUIView Implementation
-
-        public GameObject GameObject => gameObject;
-        public Transform Transform => transform;
-        public RectTransform RectTransform => transform as RectTransform;
-
-        #endregion
 
         /// <summary>
         /// Initializes the View with its ViewModel.
@@ -96,50 +144,28 @@ namespace UIFramework.Core
         /// <summary>
         /// Shows the View to the user.
         /// </summary>
-        public virtual void Show()
+        public override void Show()
         {
-            gameObject.SetActive(true);
-
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 1f;
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
-
+            base.Show();
             ViewModel?.OnViewShown();
         }
 
         /// <summary>
         /// Hides the View from the user.
         /// </summary>
-        public virtual void Hide()
+        public override void Hide()
         {
             ViewModel?.OnViewHidden();
-
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 0f;
-                canvasGroup.interactable = false;
-                canvasGroup.blocksRaycasts = false;
-            }
-
-            gameObject.SetActive(false);
+            base.Hide();
         }
 
         /// <summary>
         /// Destroys the View and disposes the ViewModel.
         /// </summary>
-        public virtual void Destroy()
+        public override void Destroy()
         {
-            // Dispose ViewModel
             ViewModel?.Dispose();
-
-            // Destroy GameObject
-            if (gameObject != null)
-            {
-                UnityEngine.Object.Destroy(gameObject);
-            }
+            base.Destroy();
         }
 
         #region Binding Helper Methods
