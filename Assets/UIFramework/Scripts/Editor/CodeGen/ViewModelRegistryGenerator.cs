@@ -14,7 +14,7 @@ namespace UIFramework.Editor.CodeGen
     /// </summary>
     public static class ViewModelRegistryGenerator
     {
-        private const string OUTPUT_PATH = "Assets/UIFramework/DI/Generated/ViewModelRegistry.cs";
+        private const string OUTPUT_PATH = "Assets/UIFramework/Scripts/DI/Generated/ViewModelRegistry.cs";
         private const string NAMESPACE = "UIFramework.DI.Generated";
 
         [MenuItem("UIFramework/Code Generation/Generate ViewModel Registry", priority = 200)]
