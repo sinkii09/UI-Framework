@@ -99,7 +99,8 @@ namespace UIFramework.DependencyInjection
 
         private void RegisterPoolingServices(IContainerBuilder builder)
         {
-            //builder.Register<IUIObjectPool, UIObjectPool>(Lifetime.Singleton);
+            builder.Register<IUIObjectPool, UIFramework.Pooling.UIObjectPool>(Lifetime.Singleton);
+            Debug.Log("[UIFrameworkInstaller] Registered UIObjectPool (using Unity's ObjectPool internally)");
         }
 
         /// <summary>
