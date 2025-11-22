@@ -1,6 +1,6 @@
 using UnityEngine;
 using UIFramework.Navigation;
-using UIFramework.DependencyInjection;
+using UIFramework.DI;
 using VContainer;
 
 namespace UIFramework.Examples

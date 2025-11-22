@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine.UI;
 using System.IO;
 using UIFramework.Configuration;
-using UIFramework.DependencyInjection;
+using UIFramework.DI;
 using UnityEngine.InputSystem.UI;
 
 namespace UIFramework.Editor

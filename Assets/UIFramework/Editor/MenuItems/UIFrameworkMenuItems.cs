@@ -243,7 +243,7 @@ namespace UIFramework.Editor
             }
 
             // Check for UIFrameworkInstaller
-            var installer = Object.FindAnyObjectByType<UIFramework.DependencyInjection.UIFrameworkInstaller>();
+            var installer = Object.FindAnyObjectByType<UIFramework.DI.UIFrameworkInstaller>();
             if (installer == null)
             {
                 log.AppendLine("✗ ERROR: No UIFrameworkInstaller found in scene");
@@ -344,7 +344,7 @@ namespace UIFramework.Editor
         [MenuItem("UIFramework/Quick Access/Find UINavigator", priority = 140)]
         public static void FindUINavigator()
         {
-            var installer = Object.FindAnyObjectByType<UIFramework.DependencyInjection.UIFrameworkInstaller>();
+            var installer = Object.FindAnyObjectByType<UIFramework.DI.UIFrameworkInstaller>();
             if (installer != null)
             {
                 Selection.activeGameObject = installer.gameObject;

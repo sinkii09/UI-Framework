@@ -2,7 +2,7 @@ using VContainer;
 using VContainer.Unity;
 using UIFramework.Core;
 
-namespace UIFramework.DependencyInjection
+namespace UIFramework.DI
 {
     /// <summary>
     /// Optional: Lifetime scope for ViewModels with specific dependencies.

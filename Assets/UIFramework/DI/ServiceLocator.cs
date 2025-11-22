@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using VContainer;
 
-namespace UIFramework.DependencyInjection
+namespace UIFramework.DI
 {
     /// <summary>
     /// Service locator wrapper for VContainer.

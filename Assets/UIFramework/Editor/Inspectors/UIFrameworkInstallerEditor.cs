@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using UIFramework.DependencyInjection;
+using UIFramework.DI;
 using UIFramework.Configuration;
 
 namespace UIFramework.Editor
