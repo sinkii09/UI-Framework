@@ -80,19 +80,21 @@ namespace UIFramework.DependencyInjection
 
         private void RegisterLoadingServices(IContainerBuilder builder)
         {
-            //if (config.useAddressables)
-            //{
-            //    #if UIFRAMEWORK_ADDRESSABLES
-            //    builder.Register<IUILoader, AddressablesUILoader>(Lifetime.Singleton);
-            //    #else
-            //    Debug.LogWarning("[UIFrameworkInstaller] Addressables is enabled in config but not installed. Falling back to Resources.");
-            //    builder.Register<IUILoader, ResourcesUILoader>(Lifetime.Singleton);
-            //    #endif
-            //}
-            //else
-            //{
-            //    builder.Register<IUILoader, ResourcesUILoader>(Lifetime.Singleton);
-            //}
+            if (config.UseAddressables)
+            {
+                #if UIFRAMEWORK_ADDRESSABLES
+                builder.Register<IUILoader, UIFramework.Loading.AddressablesUILoader>(Lifetime.Singleton);
+                Debug.Log("[UIFrameworkInstaller] Registered AddressablesUILoader");
+                #else
+                Debug.LogWarning("[UIFrameworkInstaller] Addressables is enabled in config but not installed. Falling back to Resources.");
+                builder.Register<IUILoader, UIFramework.Loading.ResourcesUILoader>(Lifetime.Singleton);
+                #endif
+            }
+            else
+            {
+                builder.Register<IUILoader, UIFramework.Loading.ResourcesUILoader>(Lifetime.Singleton);
+                Debug.Log("[UIFrameworkInstaller] Registered ResourcesUILoader");
+            }
         }
 
         private void RegisterPoolingServices(IContainerBuilder builder)
