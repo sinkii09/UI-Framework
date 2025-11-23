@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using UIFramework.Animation;
-using UIFramework.DI;
 using UIFramework.MVVM;
 using UnityEngine;
 
@@ -58,7 +57,7 @@ namespace UIFramework.Core
             var transition = GetShowTransition();
             if (transition != null)
             {
-                var animator = ServiceLocator.Get<IUIAnimator>();
+                var animator = UIFramework.Get<IUIAnimator>();
                 if (animator != null)
                 {
                     transition.Target = transform;
@@ -98,7 +97,7 @@ namespace UIFramework.Core
             var transition = GetHideTransition();
             if (transition != null)
             {
-                var animator = ServiceLocator.Get<IUIAnimator>();
+                var animator = UIFramework.Get<IUIAnimator>();
                 if (animator != null)
                 {
                     transition.Target = transform;

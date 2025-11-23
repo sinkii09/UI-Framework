@@ -1,7 +1,4 @@
 using UnityEngine;
-using UIFramework.Navigation;
-using UIFramework.DI;
-using VContainer;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -24,8 +21,6 @@ namespace UIFramework.Examples
         [Header("Settings")]
         [SerializeField] private bool autoStartMainMenu = true;
 
-        private UINavigator _navigator;
-
         private async void Start()
         {
             Debug.Log("[GameBootstrap] Starting application...");
@@ -33,12 +28,10 @@ namespace UIFramework.Examples
             // Wait one frame to ensure UIFrameworkInstaller has initialized
             await Task.Yield();
 
-            // Get navigator from service locator
-            _navigator = ServiceLocator.Get<UINavigator>();
-
-            if (_navigator == null)
+            // Check if UIFramework is ready
+            if (!Core.UIFramework.IsInitialized)
             {
-                Debug.LogError("[GameBootstrap] UINavigator not found! " +
+                Debug.LogError("[GameBootstrap] UIFramework not initialized! " +
                     "Make sure UIFrameworkInstaller is in the scene and properly configured.");
                 return;
             }
@@ -59,9 +52,9 @@ namespace UIFramework.Examples
         {
             Debug.Log("[GameBootstrap] Registering UI states...");
 
-            // Register example states
-            _navigator.RegisterState(new MenuUIState(_navigator));
-            _navigator.RegisterState(new GameplayUIState(_navigator));
+            // Register example states using static UIFramework API
+            Core.UIFramework.RegisterState(new MenuUIState());
+            Core.UIFramework.RegisterState(new GameplayUIState());
 
             Debug.Log("[GameBootstrap] States registered.");
         }
@@ -70,8 +63,8 @@ namespace UIFramework.Examples
         {
             try
             {
-                // Transition to menu state
-                await _navigator.ChangeStateAsync("Menu");
+                // Transition to menu state using static UIFramework API
+                await Core.UIFramework.ChangeStateAsync("Menu");
 
                 Debug.Log("[GameBootstrap] Main menu loaded!");
             }
@@ -84,34 +77,27 @@ namespace UIFramework.Examples
         private void Update()
         {
             // Update state machine (if states use OnUpdate)
-            _navigator?.Update();
+            Core.UIFramework.Update();
         }
     }
 
     #region Example UI States
 
     /// <summary>
-    /// Example menu UI state.
+    /// Example menu UI state using static UIFramework API.
+    /// Demonstrates loading screen and navigation.
     /// </summary>
     public class MenuUIState : Core.UIStateBase
     {
-        private readonly UINavigator _navigator;
-
         public override string StateId => "Menu";
-
-        public MenuUIState(UINavigator navigator)
-        {
-            _navigator = navigator;
-        }
 
         public override async Task OnEnterAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[MenuUIState] Entering menu state...");
-
-            // Show main menu
+            // Show main menu (loading is fully hidden now)
             try
             {
-                await _navigator.PushAsync<MainMenuView, MainMenuViewModel>(cancellationToken: cancellationToken);
+                await Core.UIFramework.PushAsync<MainMenuView, MainMenuViewModel>(cancellationToken: cancellationToken);
             }
             catch (System.Exception ex)
             {
@@ -123,32 +109,26 @@ namespace UIFramework.Examples
         public override async Task OnExitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[MenuUIState] Exiting menu state...");
-            await _navigator.ClearStack(true);
+            await Core.UIFramework.ClearStackAsync(true);
         }
     }
 
     /// <summary>
-    /// Example gameplay UI state.
+    /// Example gameplay UI state using static UIFramework API.
+    /// Demonstrates state transition with loading.
     /// </summary>
     public class GameplayUIState : Core.UIStateBase
     {
-        private readonly UINavigator _navigator;
-
         public override string StateId => "Gameplay";
-
-        public GameplayUIState(UINavigator navigator)
-        {
-            _navigator = navigator;
-        }
 
         public override async Task OnEnterAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[GameplayUIState] Entering gameplay state...");
 
-            // Show HUD
+            // Show HUD (loading is fully hidden now)
             try
             {
-                await _navigator.PushAsync<HUDView, HUDViewModel>(cancellationToken: cancellationToken);
+                await Core.UIFramework.PushAsync<HUDView, HUDViewModel>(cancellationToken: cancellationToken);
             }
             catch (System.Exception ex)
             {
@@ -159,9 +139,7 @@ namespace UIFramework.Examples
         public override async Task OnExitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[GameplayUIState] Exiting gameplay state...");
-
-            // Clear gameplay UI
-            await _navigator.ClearStack();
+            await Core.UIFramework.ClearStackAsync();
         }
 
         public override void OnUpdate()

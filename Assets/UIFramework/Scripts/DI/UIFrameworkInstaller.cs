@@ -153,13 +153,17 @@ namespace UIFramework.DI
         {
             base.Awake();
 
-            // Initialize global ServiceLocator for legacy/convenience access
-            ServiceLocator.Initialize(Container);
+            DontDestroyOnLoad(gameObject);
+
+            // Initialize static UIFramework facade
+            Core.UIFramework.Initialize(Container);
+
+            uiCanvas.transform.SetParent(transform);
         }
 
         protected override void OnDestroy()
         {
-            ServiceLocator.Reset();
+            Core.UIFramework.Reset();
             base.OnDestroy();
         }
     }
