@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UIFramework.Core;
+using System.Threading.Tasks;
 
 namespace UIFramework.Examples
 {
@@ -114,16 +115,16 @@ namespace UIFramework.Examples
             }
         }
 
-        public override void Show()
+        public override async Task Show()
         {
-            base.Show();
+            await base.Show();
             Debug.Log("[HUDView] HUD displayed");
         }
 
-        public override void Hide()
+        public override async Task Hide()
         {
             Debug.Log("[HUDView] HUD hidden");
-            base.Hide();
+            await base.Hide();
         }
     }
 }

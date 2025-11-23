@@ -31,7 +31,6 @@ namespace UIFramework.Navigation
         /// <returns>The created view instance.</returns>
         Task<TView> PushAsync<TView, TViewModel>(
             TViewModel viewModel = null,
-            UITransition transition = null,
             CancellationToken cancellationToken = default)
             where TView : UIView<TViewModel>
             where TViewModel : class, IViewModel;
@@ -43,7 +42,6 @@ namespace UIFramework.Navigation
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The view that is now at the top of the stack.</returns>
         Task<IUIView> PopAsync(
-            UITransition transition = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -52,12 +50,11 @@ namespace UIFramework.Navigation
         /// <param name="transition">Optional transition animation.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         Task PopToRootAsync(
-            UITransition transition = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Clears the entire navigation stack.
         /// </summary>
-        void Clear();
+        Task Clear(bool includeRoot = true);
     }
 }

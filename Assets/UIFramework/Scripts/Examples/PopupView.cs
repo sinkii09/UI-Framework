@@ -1,7 +1,8 @@
-using UnityEngine;
-using UnityEngine.UI;
+using System.Threading.Tasks;
 using TMPro;
 using UIFramework.Core;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace UIFramework.Examples
 {
@@ -53,16 +54,16 @@ namespace UIFramework.Examples
             }
         }
 
-        public override void Show()
+        public override async Task Show()
         {
-            base.Show();
+            await base.Show();
             Debug.Log("[PopupView] Showing popup");
         }
 
-        public override void Hide()
+        public override async Task Hide()
         {
             Debug.Log("[PopupView] Hiding popup");
-            base.Hide();
+            await base.Hide();
         }
     }
 }

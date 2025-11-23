@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UIFramework.Core
@@ -26,12 +27,12 @@ namespace UIFramework.Core
         /// <summary>
         /// Shows the view to the user.
         /// </summary>
-        void Show();
+        Task Show();
 
         /// <summary>
         /// Hides the view from the user.
         /// </summary>
-        void Hide();
+        Task Hide();
 
         /// <summary>
         /// Destroys the view and cleans up resources.

@@ -2,6 +2,8 @@ using UnityEngine;
 using UIFramework.Navigation;
 using UIFramework.DI;
 using VContainer;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace UIFramework.Examples
 {
@@ -29,7 +31,7 @@ namespace UIFramework.Examples
             Debug.Log("[GameBootstrap] Starting application...");
 
             // Wait one frame to ensure UIFrameworkInstaller has initialized
-            await System.Threading.Tasks.Task.Yield();
+            await Task.Yield();
 
             // Get navigator from service locator
             _navigator = ServiceLocator.Get<UINavigator>();
@@ -64,7 +66,7 @@ namespace UIFramework.Examples
             Debug.Log("[GameBootstrap] States registered.");
         }
 
-        private async System.Threading.Tasks.Task StartMainMenuAsync()
+        private async Task StartMainMenuAsync()
         {
             try
             {
@@ -91,7 +93,7 @@ namespace UIFramework.Examples
     /// <summary>
     /// Example menu UI state.
     /// </summary>
-    public class MenuUIState : UIFramework.Core.UIStateBase
+    public class MenuUIState : Core.UIStateBase
     {
         private readonly UINavigator _navigator;
 
@@ -102,7 +104,7 @@ namespace UIFramework.Examples
             _navigator = navigator;
         }
 
-        public override async System.Threading.Tasks.Task OnEnterAsync(System.Threading.CancellationToken cancellationToken = default)
+        public override async Task OnEnterAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[MenuUIState] Entering menu state...");
 
@@ -118,19 +120,17 @@ namespace UIFramework.Examples
             }
         }
 
-        public override async System.Threading.Tasks.Task OnExitAsync(System.Threading.CancellationToken cancellationToken = default)
+        public override async Task OnExitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[MenuUIState] Exiting menu state...");
-
-            // Clear menu stack
-            _navigator.ClearStack();
+            await _navigator.ClearStack(true);
         }
     }
 
     /// <summary>
     /// Example gameplay UI state.
     /// </summary>
-    public class GameplayUIState : UIFramework.Core.UIStateBase
+    public class GameplayUIState : Core.UIStateBase
     {
         private readonly UINavigator _navigator;
 
@@ -141,7 +141,7 @@ namespace UIFramework.Examples
             _navigator = navigator;
         }
 
-        public override async System.Threading.Tasks.Task OnEnterAsync(System.Threading.CancellationToken cancellationToken = default)
+        public override async Task OnEnterAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[GameplayUIState] Entering gameplay state...");
 
@@ -156,12 +156,12 @@ namespace UIFramework.Examples
             }
         }
 
-        public override async System.Threading.Tasks.Task OnExitAsync(System.Threading.CancellationToken cancellationToken = default)
+        public override async Task OnExitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[GameplayUIState] Exiting gameplay state...");
 
             // Clear gameplay UI
-            _navigator.ClearStack();
+            await _navigator.ClearStack();
         }
 
         public override void OnUpdate()

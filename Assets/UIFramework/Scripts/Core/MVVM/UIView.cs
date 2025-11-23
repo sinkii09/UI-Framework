@@ -1,6 +1,9 @@
 using System;
-using UnityEngine;
+using System.Threading.Tasks;
+using UIFramework.Animation;
+using UIFramework.DI;
 using UIFramework.MVVM;
+using UnityEngine;
 
 namespace UIFramework.Core
 {
@@ -23,31 +26,96 @@ namespace UIFramework.Core
 
         #endregion
 
+        #region Animation Hooks
+
         /// <summary>
-        /// Shows the View to the user.
+        /// Override to define the show animation. Return null for instant show.
         /// </summary>
-        public virtual void Show()
+        protected virtual UITransition GetShowTransition() => null;
+
+        /// <summary>
+        /// Override to define the hide animation. Return null for instant hide.
+        /// </summary>
+        protected virtual UITransition GetHideTransition() => null;
+
+        #endregion
+
+        /// <summary>
+        /// Shows the View to the user with optional animation.
+        /// </summary>
+        public virtual async Task Show()
         {
             gameObject.SetActive(true);
 
+            // Disable interaction during animation
             if (canvasGroup != null)
             {
-                canvasGroup.alpha = 1f;
+                canvasGroup.interactable = false;
+                canvasGroup.blocksRaycasts = false;
+            }
+
+            // Play show animation if defined
+            var transition = GetShowTransition();
+            if (transition != null)
+            {
+                var animator = ServiceLocator.Get<IUIAnimator>();
+                if (animator != null)
+                {
+                    transition.Target = transform;
+                    try
+                    {
+                        await animator.AnimateAsync(transition);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"[UIView] Show animation failed: {ex.Message}");
+                    }
+                }
+            }
+
+            // Enable interaction after animation completes
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1;
                 canvasGroup.interactable = true;
                 canvasGroup.blocksRaycasts = true;
             }
         }
 
         /// <summary>
-        /// Hides the View from the user.
+        /// Hides the View from the user with optional animation.
         /// </summary>
-        public virtual void Hide()
+        public virtual async Task Hide()
         {
+            // Disable interaction during hide animation
+            if (canvasGroup != null)
+            {
+                canvasGroup.interactable = false;
+                canvasGroup.blocksRaycasts = false;
+            }
+
+            // Play hide animation if defined
+            var transition = GetHideTransition();
+            if (transition != null)
+            {
+                var animator = ServiceLocator.Get<IUIAnimator>();
+                if (animator != null)
+                {
+                    transition.Target = transform;
+                    try
+                    {
+                        await animator.AnimateAsync(transition);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"[UIView] Hide animation failed: {ex.Message}");
+                    }
+                }
+            }
+
             if (canvasGroup != null)
             {
                 canvasGroup.alpha = 0f;
-                canvasGroup.interactable = false;
-                canvasGroup.blocksRaycasts = false;
             }
 
             gameObject.SetActive(false);
@@ -144,19 +212,19 @@ namespace UIFramework.Core
         /// <summary>
         /// Shows the View to the user.
         /// </summary>
-        public override void Show()
+        public override async Task Show()
         {
-            base.Show();
+            await base.Show();
             ViewModel?.OnViewShown();
         }
 
         /// <summary>
         /// Hides the View from the user.
         /// </summary>
-        public override void Hide()
+        public override async Task Hide()
         {
             ViewModel?.OnViewHidden();
-            base.Hide();
+            await base.Hide();
         }
 
         /// <summary>

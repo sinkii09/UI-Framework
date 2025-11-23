@@ -33,7 +33,6 @@ namespace UIFramework.Navigation
 
         public async Task<TView> PushAsync<TView, TViewModel>(
             TViewModel viewModel = null,
-            UITransition transition = null,
             CancellationToken cancellationToken = default)
             where TView : UIView<TViewModel>
             where TViewModel : class, IViewModel
@@ -48,11 +47,11 @@ namespace UIFramework.Navigation
 
             Debug.Log($"[NavigationStack] Pushing: {typeof(TView).Name}");
 
-            // Hide current view
-            if (CurrentView != null)
-            {
-                CurrentView.Hide();
-            }
+            //// Hide current view and wait for animation
+            //if (CurrentView != null)
+            //{
+            //    await CurrentView.Hide();
+            //}
 
             // Create new view
             var view = await _viewFactory.CreateAsync<TView, TViewModel>(viewModel, cancellationToken);
@@ -60,15 +59,14 @@ namespace UIFramework.Navigation
             // Add to stack
             _viewStack.Push(view);
 
-            // Show with optional transition
-            view.Show();
+            // Show with animation and wait for completion
+            await view.Show();
 
             Debug.Log($"[NavigationStack] Push complete. Stack depth: {_viewStack.Count}");
             return view;
         }
 
         public async Task<IUIView> PopAsync(
-            UITransition transition = null,
             CancellationToken cancellationToken = default)
         {
             if (_viewStack.Count == 0)
@@ -87,16 +85,15 @@ namespace UIFramework.Navigation
             // Get and remove current view
             var currentView = _viewStack.Pop();
 
-            // Hide and destroy
-            currentView.Hide();
-            await Task.Yield(); // Allow one frame for hide animation if needed
+            // Hide and wait for animation to complete
+            await currentView.Hide();
             currentView.Destroy();
 
-            // Show previous view
+            // Show previous view and wait for animation
             var previousView = CurrentView;
             if (previousView != null)
             {
-                previousView.Show();
+                await previousView.Show();
             }
 
             Debug.Log($"[NavigationStack] Pop complete. Stack depth: {_viewStack.Count}");
@@ -104,7 +101,6 @@ namespace UIFramework.Navigation
         }
 
         public async Task PopToRootAsync(
-            UITransition transition = null,
             CancellationToken cancellationToken = default)
         {
             if (_viewStack.Count <= 1)
@@ -122,34 +118,39 @@ namespace UIFramework.Navigation
                 viewsToRemove.Add(_viewStack.Pop());
             }
 
-            // Hide and destroy all except root
-            foreach (var view in viewsToRemove)
+            // Hide and destroy all except root (await last view's hide animation)
+            for (int i = 0; i < viewsToRemove.Count; i++)
             {
-                view.Hide();
+                var view = viewsToRemove[i];
+                if (i == 0) // Only wait for the first (top) view's hide animation
+                {
+                    await view.Hide();
+                }
+                else
+                {
+                    _ = view.Hide(); // Fire and forget for others
+                }
                 view.Destroy();
             }
 
-            // Show root
+            // Show root and wait for animation
             if (CurrentView != null)
             {
-                CurrentView.Show();
+                await CurrentView.Show();
             }
 
             Debug.Log("[NavigationStack] Pop to root complete.");
         }
 
-        public void Clear()
+        public async Task Clear(bool includeRoot = true)
         {
-            Debug.Log($"[NavigationStack] Clearing stack. Depth: {_viewStack.Count}");
-
-            while (_viewStack.Count > 0)
+            int targetCount = includeRoot ? 0 : 1;
+            while (_viewStack.Count > targetCount)
             {
                 var view = _viewStack.Pop();
-                view.Hide();
+                await view.Hide();
                 view.Destroy();
             }
-
-            Debug.Log("[NavigationStack] Stack cleared.");
         }
     }
 }
