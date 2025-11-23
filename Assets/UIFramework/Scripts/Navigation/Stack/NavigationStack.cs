@@ -91,10 +91,6 @@ namespace UIFramework.Navigation
 
             // Show previous view and wait for animation
             var previousView = CurrentView;
-            if (previousView != null)
-            {
-                await previousView.Show();
-            }
 
             Debug.Log($"[NavigationStack] Pop complete. Stack depth: {_viewStack.Count}");
             return previousView;
@@ -131,12 +127,6 @@ namespace UIFramework.Navigation
                     _ = view.Hide(); // Fire and forget for others
                 }
                 view.Destroy();
-            }
-
-            // Show root and wait for animation
-            if (CurrentView != null)
-            {
-                await CurrentView.Show();
             }
 
             Debug.Log("[NavigationStack] Pop to root complete.");

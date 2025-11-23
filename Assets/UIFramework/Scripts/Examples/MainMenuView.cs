@@ -58,30 +58,58 @@ namespace UIFramework.Examples
         #region Animations
 
         /// <summary>
-        /// Define the show animation - fade in + scale up.
+        /// Define the show animation - fade in + scale up with overshoot for polished pop-in effect.
         /// </summary>
         protected override UITransition GetShowTransition()
         {
-            return new FadeTransition
+            return new SequenceTransition
             {
-                FromAlpha = 0f,
-                ToAlpha = 1f,
-                Duration = 0.3f,
-                EaseType = Ease.OutCubic
+                PlayInParallel = true,
+                Transitions = new System.Collections.Generic.List<UITransition>
+                {
+                    new FadeTransition
+                    {
+                        FromAlpha = 0f,
+                        ToAlpha = 1f,
+                        Duration = 0.5f,
+                        EaseType = Ease.OutCubic
+                    },
+                    new ScaleTransition
+                    {
+                        FromScale = Vector3.one * 0.8f,
+                        ToScale = Vector3.one,
+                        Duration = 0.5f,
+                        EaseType = Ease.OutBack
+                    }
+                }
             };
         }
 
         /// <summary>
-        /// Define the hide animation - fade out.
+        /// Define the hide animation - fade out + scale down for smooth exit.
         /// </summary>
         protected override UITransition GetHideTransition()
         {
-            return new FadeTransition
+            return new SequenceTransition
             {
-                FromAlpha = 1f,
-                ToAlpha = 0f,
-                Duration = 0.2f,
-                EaseType = Ease.InCubic
+                PlayInParallel = true,
+                Transitions = new System.Collections.Generic.List<UITransition>
+                {
+                    new FadeTransition
+                    {
+                        FromAlpha = 1f,
+                        ToAlpha = 0f,
+                        Duration = 0.25f,
+                        EaseType = Ease.InCubic
+                    },
+                    new ScaleTransition
+                    {
+                        FromScale = Vector3.one,
+                        ToScale = Vector3.one * 0.9f,
+                        Duration = 0.25f,
+                        EaseType = Ease.InCubic
+                    }
+                }
             };
         }
 

@@ -237,10 +237,10 @@ namespace UIFramework.Core
         /// </summary>
         /// <param name="stateId">The state ID to transition to.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public static Task ChangeStateAsync(string stateId, CancellationToken cancellationToken = default)
+        public static Task ChangeStateAsync<T>(CancellationToken cancellationToken = default) where T : IUIState
         {
             EnsureInitialized();
-            return _navigator.ChangeStateAsync(stateId, cancellationToken);
+            return _navigator.ChangeStateAsync<T>(cancellationToken);
         }
 
         /// <summary>
@@ -252,18 +252,6 @@ namespace UIFramework.Core
             {
                 EnsureInitialized();
                 return _navigator.CurrentState;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current state ID.
-        /// </summary>
-        public static string CurrentStateId
-        {
-            get
-            {
-                EnsureInitialized();
-                return _navigator.CurrentStateId;
             }
         }
 

@@ -81,7 +81,7 @@ namespace UIFramework.Examples
             });
 
             // Navigate to gameplay (example - would need GameplayView/ViewModel)
-            await _navigator.ChangeStateAsync("Gameplay");
+            await _navigator.ChangeStateAsync<GameplayUIState>();
         }
 
         private async Task OnSettingsClickedAsync()

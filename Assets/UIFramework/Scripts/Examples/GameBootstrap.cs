@@ -64,7 +64,7 @@ namespace UIFramework.Examples
             try
             {
                 // Transition to menu state using static UIFramework API
-                await Core.UIFramework.ChangeStateAsync("Menu");
+                await Core.UIFramework.ChangeStateAsync<MenuUIState>();
 
                 Debug.Log("[GameBootstrap] Main menu loaded!");
             }
@@ -89,8 +89,6 @@ namespace UIFramework.Examples
     /// </summary>
     public class MenuUIState : Core.UIStateBase
     {
-        public override string StateId => "Menu";
-
         public override async Task OnEnterAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[MenuUIState] Entering menu state...");
@@ -119,8 +117,6 @@ namespace UIFramework.Examples
     /// </summary>
     public class GameplayUIState : Core.UIStateBase
     {
-        public override string StateId => "Gameplay";
-
         public override async Task OnEnterAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[GameplayUIState] Entering gameplay state...");

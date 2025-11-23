@@ -1,6 +1,6 @@
 using UIFramework.Core;
-using UIFramework.MVVM;
 using UIFramework.Events;
+using UIFramework.MVVM;
 
 namespace UIFramework.Examples
 {
@@ -85,10 +85,11 @@ namespace UIFramework.Examples
             TimerText.Value = $"{minutes:00}:{seconds:00}";
         }
 
-        private void OnPauseClicked()
+        private async void OnPauseClicked()
         {
             UnityEngine.Debug.Log("[HUDViewModel] Pause button clicked!");
             _eventBus.Publish(new GamePausedEvent());
+            await Core.UIFramework.ChangeStateAsync<MenuUIState>();
         }
     }
 

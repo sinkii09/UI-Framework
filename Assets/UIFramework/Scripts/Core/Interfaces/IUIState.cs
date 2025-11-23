@@ -6,14 +6,10 @@ namespace UIFramework.Core
     /// <summary>
     /// Interface for UI states in the state machine.
     /// Each state represents a distinct UI mode (Menu, Gameplay, Pause, etc.).
+    /// States are identified by their Type instead of string IDs for type-safety.
     /// </summary>
     public interface IUIState
     {
-        /// <summary>
-        /// Unique identifier for this state.
-        /// </summary>
-        string StateId { get; }
-
         /// <summary>
         /// Called when transitioning into this state.
         /// Use this to load UI, initialize systems, etc.

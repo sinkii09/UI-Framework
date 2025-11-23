@@ -24,7 +24,6 @@ namespace UIFramework.Navigation
         /// <summary>
         /// Gets the current state ID.
         /// </summary>
-        public string CurrentStateId => _stateMachine.CurrentStateId;
 
         /// <summary>
         /// Gets the currently visible view from the navigation stack.
@@ -59,41 +58,13 @@ namespace UIFramework.Navigation
         }
 
         /// <summary>
-        /// Unregisters a UI state from the state machine.
-        /// </summary>
-        /// <param name="stateId">The state ID to unregister.</param>
-        /// <returns>True if the state was unregistered.</returns>
-        public bool UnregisterState(string stateId)
-        {
-            return _stateMachine.UnregisterState(stateId);
-        }
-
-        /// <summary>
         /// Transitions to a new UI state.
         /// </summary>
         /// <param name="stateId">The state ID to transition to.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Task ChangeStateAsync(string stateId, CancellationToken cancellationToken = default)
+        public Task ChangeStateAsync<T>(CancellationToken cancellationToken = default) where T : IUIState
         {
-            return _stateMachine.TransitionToAsync(stateId, cancellationToken);
-        }
-
-        /// <summary>
-        /// Checks if a state is registered.
-        /// </summary>
-        /// <param name="stateId">The state ID.</param>
-        /// <returns>True if registered.</returns>
-        public bool HasState(string stateId)
-        {
-            return _stateMachine.HasState(stateId);
-        }
-
-        /// <summary>
-        /// Gets all registered state IDs.
-        /// </summary>
-        public IEnumerable<string> GetRegisteredStateIds()
-        {
-            return _stateMachine.GetRegisteredStateIds();
+            return _stateMachine.TransitionToAsync<T>(cancellationToken);
         }
 
         /// <summary>

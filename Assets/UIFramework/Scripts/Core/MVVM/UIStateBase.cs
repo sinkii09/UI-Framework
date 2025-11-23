@@ -6,14 +6,10 @@ namespace UIFramework.Core
     /// <summary>
     /// Base class for UI states in the state machine.
     /// Override OnEnterAsync/OnExitAsync to define state behavior.
+    /// States are identified by their Type for type-safety (no string IDs needed).
     /// </summary>
     public abstract class UIStateBase : IUIState
     {
-        /// <summary>
-        /// Unique identifier for this state.
-        /// </summary>
-        public abstract string StateId { get; }
-
         /// <summary>
         /// Called when transitioning into this state.
         /// Override to load UI, initialize systems, etc.

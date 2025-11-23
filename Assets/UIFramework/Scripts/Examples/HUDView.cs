@@ -1,8 +1,10 @@
+using DG.Tweening;
+using System.Threading.Tasks;
+using TMPro;
+using UIFramework.Animation;
+using UIFramework.Core;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using UIFramework.Core;
-using System.Threading.Tasks;
 
 namespace UIFramework.Examples
 {
@@ -114,17 +116,60 @@ namespace UIFramework.Examples
                 fillImage.color = Color.red;
             }
         }
-
-        public override async Task Show()
+        /// <summary>
+        /// Define the show animation - slide down from top + fade in for natural HUD appearance.
+        /// </summary>
+        protected override UITransition GetShowTransition()
         {
-            await base.Show();
-            Debug.Log("[HUDView] HUD displayed");
+            return new SequenceTransition
+            {
+                PlayInParallel = true,
+                Transitions = new System.Collections.Generic.List<UITransition>
+                {
+                    new FadeTransition
+                    {
+                        FromAlpha = 0f,
+                        ToAlpha = 1f,
+                        Duration = 0.4f,
+                        EaseType = Ease.OutCubic
+                    },
+                    new SlideTransition
+                    {
+                        Direction = SlideTransition.SlideDirection.Up,
+                        Distance = 200f,
+                        Duration = 0.4f,
+                        EaseType = Ease.OutCubic
+                    }
+                }
+            };
         }
 
-        public override async Task Hide()
+        /// <summary>
+        /// Define the hide animation - slide up + fade out.
+        /// </summary>
+        protected override UITransition GetHideTransition()
         {
-            Debug.Log("[HUDView] HUD hidden");
-            await base.Hide();
+            return new SequenceTransition
+            {
+                PlayInParallel = true,
+                Transitions = new System.Collections.Generic.List<UITransition>
+                {
+                    new FadeTransition
+                    {
+                        FromAlpha = 1f,
+                        ToAlpha = 0f,
+                        Duration = 0.3f,
+                        EaseType = Ease.InCubic
+                    },
+                    new SlideTransition
+                    {
+                        Direction = SlideTransition.SlideDirection.Up,
+                        Distance = 200f,
+                        Duration = 0.3f,
+                        EaseType = Ease.InCubic
+                    }
+                }
+            };
         }
     }
 }
