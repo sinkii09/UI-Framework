@@ -12,24 +12,24 @@ namespace UIFramework.Core
         /// <summary>
         /// Gets an instance from the pool or creates a new one if none available.
         /// </summary>
-        /// <typeparam name="T">The component type.</typeparam>
+        /// <typeparam name="T">The UI view type (must be Component and implement IUIView).</typeparam>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         /// <returns>An instance of the requested type.</returns>
-        Task<T> GetAsync<T>(CancellationToken cancellationToken = default) where T : Component;
+        Task<T> GetAsync<T>(CancellationToken cancellationToken = default) where T : Component, IUIView;
 
         /// <summary>
-        /// Returns an instance to the pool for reuse.
+        /// Returns an instance to the pool for reuse (generic version).
         /// </summary>
-        /// <typeparam name="T">The component type.</typeparam>
+        /// <typeparam name="T">The UI view type (must be Component and implement IUIView).</typeparam>
         /// <param name="instance">The instance to return.</param>
-        void Return<T>(T instance) where T : Component;
+        void Return<T>(T instance) where T : Component, IUIView;
 
         /// <summary>
-        /// Pre-instantiates a number of instances for immediate availability.
+        /// Returns an instance to the pool for reuse (non-generic version).
+        /// Automatically determines the concrete type and routes to the appropriate pool.
         /// </summary>
-        /// <typeparam name="T">The component type.</typeparam>
-        /// <param name="count">The number of instances to create.</param>
-        void Warmup<T>(int count) where T : Component;
+        /// <param name="instance">The instance to return.</param>
+        void Return(IUIView instance);
 
         /// <summary>
         /// Clears all pools and destroys all instances.

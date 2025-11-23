@@ -1,32 +1,32 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace UIFramework.Core
 {
     /// <summary>
-    /// Factory for creating UI views with automatic dependency injection.
-    /// Uses VContainer for ViewModel instantiation and IUILoader for prefab loading.
+    /// Factory for creating UI views with automatic dependency injection and pooling.
+    /// Uses UIObjectPool for view reuse, VContainer for ViewModel instantiation.
     /// </summary>
     public class UIViewFactory : IUIViewFactory
     {
-        private readonly IUILoader _uiLoader;
+        private readonly IUIObjectPool _objectPool;
         private readonly IObjectResolver _container;
         private readonly Transform _rootTransform;
 
         /// <summary>
         /// Creates a new UIViewFactory.
         /// </summary>
-        /// <param name="uiLoader">The UI loader for loading prefabs.</param>
+        /// <param name="objectPool">The object pool for reusing views.</param>
         /// <param name="container">The VContainer resolver for dependency injection.</param>
         /// <param name="uiCanvas">The Canvas where UI views will be instantiated.</param>
-        public UIViewFactory(IUILoader uiLoader, IObjectResolver container, Canvas uiCanvas)
+        public UIViewFactory(IUIObjectPool objectPool, IObjectResolver container, Canvas uiCanvas)
         {
-            _uiLoader = uiLoader ?? throw new ArgumentNullException(nameof(uiLoader));
+            _objectPool = objectPool ?? throw new ArgumentNullException(nameof(objectPool));
             _container = container ?? throw new ArgumentNullException(nameof(container));
 
             if (uiCanvas == null)
@@ -53,19 +53,12 @@ namespace UIFramework.Core
 
             try
             {
-                // Load the view prefab
-                var prefab = await _uiLoader.LoadAsync<TView>(viewType.Name, cancellationToken);
+                // Get view from pool (pool handles prefab loading and instantiation)
+                var viewInstance = await _objectPool.GetAsync<TView>(cancellationToken);
 
-                if (prefab == null)
-                {
-                    throw new InvalidOperationException(
-                        $"Failed to load prefab for view '{viewType.Name}'. " +
-                        "Ensure the prefab exists in Resources/UI/ or is addressable with the correct key.");
-                }
-
-                // Instantiate the view
-                var viewInstance = UnityEngine.Object.Instantiate(prefab, _rootTransform);
-                viewInstance.name = viewType.Name; // Clean up name (remove "(Clone)")
+                // Move to canvas and set name
+                viewInstance.transform.SetParent(_rootTransform, false);
+                viewInstance.name = viewType.Name;
 
                 // Create or resolve ViewModel
                 TViewModel viewModelInstance;
@@ -126,9 +119,12 @@ namespace UIFramework.Core
                 return;
             }
 
-            Debug.Log($"[UIViewFactory] Destroying view: {view.GetType().Name}");
+            Debug.Log($"[UIViewFactory] Returning view to pool: {view.GetType().Name}");
 
-            view.Destroy();
+            // Cleanup the view before returning to pool
+            view.Cleanup();
+
+            _objectPool.Return(view);
         }
 
         /// <summary>

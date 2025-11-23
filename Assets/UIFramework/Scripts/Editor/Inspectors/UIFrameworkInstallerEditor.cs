@@ -77,10 +77,6 @@ namespace UIFramework.Editor
                 EditorGUILayout.LabelField("• IUIViewFactory", EditorStyles.miniLabel);
                 EditorGUILayout.LabelField("• IUIAnimator", EditorStyles.miniLabel);
                 EditorGUILayout.LabelField($"• IUILoader ({(config.UseAddressables ? "Addressables" : "Resources")})", EditorStyles.miniLabel);
-                if (config.EnablePooling)
-                {
-                    EditorGUILayout.LabelField("• IUIObjectPool", EditorStyles.miniLabel);
-                }
                 EditorGUI.indentLevel--;
             }
 

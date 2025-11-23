@@ -33,10 +33,6 @@ namespace UIFramework.Configuration
         [Tooltip("Whether to maintain navigation history for back button support.")]
         public bool EnableNavigationHistory = true;
 
-        [Header("Pooling")]
-        [Tooltip("Enable object pooling for frequently instantiated UI.")]
-        public bool EnablePooling = true;
-
         [Tooltip("Default pool size for UI elements.")]
         [Range(1, 50)]
         public int DefaultPoolSize = 5;

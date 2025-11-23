@@ -9,8 +9,9 @@ namespace UIFramework.Core
     /// <summary>
     /// Non-generic base class for all UI Views.
     /// Allows editor scripts to reference views without knowing the generic type parameter.
+    /// Implements IPoolable for object pooling support.
     /// </summary>
-    public abstract class UIViewBase : MonoBehaviour, IUIView
+    public abstract class UIViewBase : MonoBehaviour, IUIView, IPoolable
     {
         /// <summary>
         /// The CanvasGroup component (added automatically if not present).
@@ -121,7 +122,15 @@ namespace UIFramework.Core
         }
 
         /// <summary>
-        /// Destroys the View.
+        /// Cleans up the view before returning to pool (virtual, override in UIView<T>).
+        /// </summary>
+        public virtual void Cleanup()
+        {
+            // Override in derived classes
+        }
+
+        /// <summary>
+        /// Destroys the View (only when not using pooling).
         /// </summary>
         public virtual void Destroy()
         {
@@ -130,6 +139,28 @@ namespace UIFramework.Core
                 UnityEngine.Object.Destroy(gameObject);
             }
         }
+
+        #region IPoolable Implementation
+
+        /// <summary>
+        /// Called when retrieved from pool.
+        /// </summary>
+        public virtual void OnSpawnedFromPool()
+        {
+            // Base implementation - override if needed
+            gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Called when returned to pool.
+        /// </summary>
+        public virtual void OnReturnedToPool()
+        {
+            // Base implementation - override if needed
+            gameObject.SetActive(false);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -168,7 +199,7 @@ namespace UIFramework.Core
 
             ViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
 
-            // Ensure CanvasGroup exists
+            // Ensure CanvasGroup exists (only look up if not already cached)
             if (canvasGroup == null)
             {
                 canvasGroup = GetComponent<CanvasGroup>();
@@ -176,10 +207,13 @@ namespace UIFramework.Core
                     canvasGroup = gameObject.AddComponent<CanvasGroup>();
             }
 
-            // Ensure PropertyBinder exists
-            Binder = GetComponent<PropertyBinder>();
+            // Ensure PropertyBinder exists (only look up if not already cached)
             if (Binder == null)
-                Binder = gameObject.AddComponent<PropertyBinder>();
+            {
+                Binder = GetComponent<PropertyBinder>();
+                if (Binder == null)
+                    Binder = gameObject.AddComponent<PropertyBinder>();
+            }
 
             // Initialize ViewModel
             ViewModel.Initialize();
@@ -227,7 +261,30 @@ namespace UIFramework.Core
         }
 
         /// <summary>
-        /// Destroys the View and disposes the ViewModel.
+        /// Cleans up the view before returning to pool.
+        /// Unbinds ViewModel and clears bindings.
+        /// </summary>
+        public override void Cleanup()
+        {
+            // Dispose ViewModel (will be recreated on next spawn)
+            if (ViewModel != null && !ViewModel.Equals(null))
+            {
+                ViewModel.Dispose();
+                ViewModel = default(TViewModel);
+            }
+
+            // Clear all bindings
+            if (Binder != null)
+            {
+                Binder.UnbindAll();
+            }
+
+            IsInitialized = false;
+            base.Cleanup();
+        }
+
+        /// <summary>
+        /// Destroys the View and disposes the ViewModel (only when not using pooling).
         /// </summary>
         public override void Destroy()
         {

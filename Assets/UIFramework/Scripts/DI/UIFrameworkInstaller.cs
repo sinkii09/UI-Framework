@@ -38,7 +38,12 @@ namespace UIFramework.DI
             // Register configuration
             builder.RegisterInstance(config);
 
-            // Register core services
+            // Register loading (must be before pooling)
+            RegisterLoadingServices(builder);
+
+            RegisterPoolingServices(builder);
+
+            // Register core services (UIViewFactory depends on IUIObjectPool)
             RegisterCoreServices(builder);
 
             // Register navigation
@@ -46,15 +51,6 @@ namespace UIFramework.DI
 
             // Register animation
             RegisterAnimationServices(builder);
-
-            // Register loading
-            RegisterLoadingServices(builder);
-
-            // Register pooling (optional)
-            if (config.EnablePooling)
-            {
-                RegisterPoolingServices(builder);
-            }
 
             // Register ViewModels using generated code (zero runtime overhead!)
             RegisterViewModels(builder);

@@ -35,7 +35,12 @@ namespace UIFramework.Core
         Task Hide();
 
         /// <summary>
-        /// Destroys the view and cleans up resources.
+        /// Cleans up the view before returning to pool (unbinds ViewModel, clears state).
+        /// </summary>
+        void Cleanup();
+
+        /// <summary>
+        /// Destroys the view and cleans up resources (only use when not pooling).
         /// </summary>
         void Destroy();
     }

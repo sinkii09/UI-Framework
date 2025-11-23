@@ -87,7 +87,9 @@ namespace UIFramework.Navigation
 
             // Hide and wait for animation to complete
             await currentView.Hide();
-            currentView.Destroy();
+
+            // Return to pool via factory
+            _viewFactory.Destroy(currentView);
 
             // Show previous view and wait for animation
             var previousView = CurrentView;
@@ -114,7 +116,7 @@ namespace UIFramework.Navigation
                 viewsToRemove.Add(_viewStack.Pop());
             }
 
-            // Hide and destroy all except root (await last view's hide animation)
+            // Hide and return all to pool (await last view's hide animation)
             for (int i = 0; i < viewsToRemove.Count; i++)
             {
                 var view = viewsToRemove[i];
@@ -126,7 +128,9 @@ namespace UIFramework.Navigation
                 {
                     _ = view.Hide(); // Fire and forget for others
                 }
-                view.Destroy();
+
+                // Return to pool via factory
+                _viewFactory.Destroy(view);
             }
 
             Debug.Log("[NavigationStack] Pop to root complete.");
@@ -139,7 +143,9 @@ namespace UIFramework.Navigation
             {
                 var view = _viewStack.Pop();
                 await view.Hide();
-                view.Destroy();
+
+                // Return to pool via factory
+                _viewFactory.Destroy(view);
             }
         }
     }
