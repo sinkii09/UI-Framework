@@ -3,25 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using UIFramework.Animation;
 using UIFramework.Events;
-using UIFramework.Loading;
 using UIFramework.Navigation;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer;
 
 namespace UIFramework.Core
 {
-    /// <summary>
-    /// Static facade for UIFramework.
-    /// External modules communicate with the framework through this API.
-    /// Provides unified access to navigation, loading screens, events, and more.
-    ///
-    /// Usage:
-    ///   await UIFramework.PushAsync&lt;MainMenuView, MainMenuViewModel&gt;();
-    ///   await UIFramework.ShowLoadingAsync("Loading...");
-    ///   UIFramework.PublishEvent(new GameStartEvent());
-    /// </summary>
-    public static class UIFramework
+    public static class UIManager
     {
         #region Internal Services
 
@@ -49,7 +37,7 @@ namespace UIFramework.Core
             }
 
             _navigator = container.Resolve<UINavigator>();
-            _eventBus =  container.Resolve<UIEventBus>();
+            _eventBus = container.Resolve<UIEventBus>();
 
             _isInitialized = true;
         }

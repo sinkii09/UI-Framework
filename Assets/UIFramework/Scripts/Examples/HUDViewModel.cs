@@ -89,7 +89,7 @@ namespace UIFramework.Examples
         {
             UnityEngine.Debug.Log("[HUDViewModel] Pause button clicked!");
             _eventBus.Publish(new GamePausedEvent());
-            await Core.UIFramework.ChangeStateAsync<MenuUIState>();
+            await Core.UIManager.ChangeStateAsync<MenuUIState>();
         }
     }
 

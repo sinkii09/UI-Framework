@@ -58,7 +58,7 @@ namespace UIFramework.Core
             var transition = GetShowTransition();
             if (transition != null)
             {
-                var animator = UIFramework.Get<IUIAnimator>();
+                var animator = UIManager.Get<IUIAnimator>();
                 if (animator != null)
                 {
                     transition.Target = transform;
@@ -98,7 +98,7 @@ namespace UIFramework.Core
             var transition = GetHideTransition();
             if (transition != null)
             {
-                var animator = UIFramework.Get<IUIAnimator>();
+                var animator = UIManager.Get<IUIAnimator>();
                 if (animator != null)
                 {
                     transition.Target = transform;

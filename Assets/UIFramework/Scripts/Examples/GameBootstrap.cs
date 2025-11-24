@@ -29,7 +29,7 @@ namespace UIFramework.Examples
             await Task.Yield();
 
             // Check if UIFramework is ready
-            if (!Core.UIFramework.IsInitialized)
+            if (!Core.UIManager.IsInitialized)
             {
                 Debug.LogError("[GameBootstrap] UIFramework not initialized! " +
                     "Make sure UIFrameworkInstaller is in the scene and properly configured.");
@@ -53,8 +53,8 @@ namespace UIFramework.Examples
             Debug.Log("[GameBootstrap] Registering UI states...");
 
             // Register example states using static UIFramework API
-            Core.UIFramework.RegisterState(new MenuUIState());
-            Core.UIFramework.RegisterState(new GameplayUIState());
+            Core.UIManager.RegisterState(new MenuUIState());
+            Core.UIManager.RegisterState(new GameplayUIState());
 
             Debug.Log("[GameBootstrap] States registered.");
         }
@@ -64,7 +64,7 @@ namespace UIFramework.Examples
             try
             {
                 // Transition to menu state using static UIFramework API
-                await Core.UIFramework.ChangeStateAsync<MenuUIState>();
+                await Core.UIManager.ChangeStateAsync<MenuUIState>();
 
                 Debug.Log("[GameBootstrap] Main menu loaded!");
             }
@@ -77,7 +77,7 @@ namespace UIFramework.Examples
         private void Update()
         {
             // Update state machine (if states use OnUpdate)
-            Core.UIFramework.Update();
+            Core.UIManager.Update();
         }
     }
 
@@ -95,7 +95,7 @@ namespace UIFramework.Examples
             // Show main menu (loading is fully hidden now)
             try
             {
-                await Core.UIFramework.PushAsync<MainMenuView, MainMenuViewModel>(cancellationToken: cancellationToken);
+                await Core.UIManager.PushAsync<MainMenuView, MainMenuViewModel>(cancellationToken: cancellationToken);
             }
             catch (System.Exception ex)
             {
@@ -107,7 +107,7 @@ namespace UIFramework.Examples
         public override async Task OnExitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[MenuUIState] Exiting menu state...");
-            await Core.UIFramework.ClearStackAsync(true);
+            await Core.UIManager.ClearStackAsync(true);
         }
     }
 
@@ -124,7 +124,7 @@ namespace UIFramework.Examples
             // Show HUD (loading is fully hidden now)
             try
             {
-                await Core.UIFramework.PushAsync<HUDView, HUDViewModel>(cancellationToken: cancellationToken);
+                await Core.UIManager.PushAsync<HUDView, HUDViewModel>(cancellationToken: cancellationToken);
             }
             catch (System.Exception ex)
             {
@@ -135,7 +135,7 @@ namespace UIFramework.Examples
         public override async Task OnExitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Log("[GameplayUIState] Exiting gameplay state...");
-            await Core.UIFramework.ClearStackAsync();
+            await Core.UIManager.ClearStackAsync();
         }
 
         public override void OnUpdate()

@@ -7,6 +7,7 @@ using UIFramework.Core;
 using UIFramework.Events;
 using UIFramework.Navigation;
 using UIFramework.Configuration;
+using UIFramework.UI;
 
 namespace UIFramework.DI
 {
@@ -67,7 +68,7 @@ namespace UIFramework.DI
         {
             #if UNITY_EDITOR
             // In editor, check if registry exists and warn if not
-            if (!System.IO.File.Exists("Assets/UIFramework/DI/Generated/ViewModelRegistry.cs"))
+            if (!System.IO.File.Exists("Assets/UIFramework/Scripts/UI/Generated/ViewModelRegistry.cs"))
             {
                 Debug.LogWarning("[UIFrameworkInstaller] ViewModelRegistry.cs not found. Run 'UIFramework > Code Generation > Generate ViewModel Registry' to create it.");
                 return;
@@ -77,7 +78,7 @@ namespace UIFramework.DI
             // Use generated registry (compile-time, zero runtime overhead)
             try
             {
-                DI.Generated.ViewModelRegistry.RegisterAll(builder);
+                ViewModelRegistry.RegisterAll(builder);
                 Debug.Log("[UIFrameworkInstaller] Registered ViewModels using generated code");
             }
             catch (Exception ex)
@@ -152,14 +153,14 @@ namespace UIFramework.DI
             DontDestroyOnLoad(gameObject);
 
             // Initialize static UIFramework facade
-            Core.UIFramework.Initialize(Container);
+            Core.UIManager.Initialize(Container);
 
             uiCanvas.transform.SetParent(transform);
         }
 
         protected override void OnDestroy()
         {
-            Core.UIFramework.Reset();
+            Core.UIManager.Reset();
             base.OnDestroy();
         }
     }

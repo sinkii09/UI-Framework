@@ -14,8 +14,9 @@ namespace UIFramework.Editor.CodeGen
     /// </summary>
     public static class ViewModelRegistryGenerator
     {
-        private const string OUTPUT_PATH = "Assets/UIFramework/Scripts/DI/Generated/ViewModelRegistry.cs";
-        private const string NAMESPACE = "UIFramework.DI.Generated";
+        private const string SEARCH_PATH = "Assets/UIFramework/Scripts/UI";
+        private const string OUTPUT_PATH = "Assets/UIFramework/Scripts/UI/Generated/ViewModelRegistry.cs";
+        private const string NAMESPACE = "UIFramework.UI";
 
         [MenuItem("UIFramework/Code Generation/Generate ViewModel Registry", priority = 200)]
         public static void GenerateRegistry()
@@ -27,7 +28,6 @@ namespace UIFramework.Editor.CodeGen
             if (viewModels.Count == 0)
             {
                 Debug.LogWarning("[ViewModelRegistryGenerator] No ViewModels found.");
-                return;
             }
 
             var code = GenerateCode(viewModels);
@@ -65,38 +65,122 @@ namespace UIFramework.Editor.CodeGen
             var viewModelBaseType = typeof(UIFramework.Core.ViewModelBase);
             var viewModels = new List<Type>();
 
-            // Get all assemblies
+            // Check if search directory exists
+            if (!Directory.Exists(SEARCH_PATH))
+            {
+                Debug.LogWarning($"[ViewModelRegistryGenerator] Search path does not exist: {SEARCH_PATH}");
+                return viewModels;
+            }
+
+            // Find all C# files in search directory
+            var csFiles = Directory.GetFiles(SEARCH_PATH, "*.cs", SearchOption.AllDirectories);
+
+            foreach (var filePath in csFiles)
+            {
+                try
+                {
+                    // Skip generated files
+                    if (filePath.Contains("Generated"))
+                    {
+                        continue;
+                    }
+
+                    var typeInfos = ParseViewModelsFromFile(filePath);
+
+                    foreach (var typeInfo in typeInfos)
+                    {
+                        // Try to get the actual Type object
+                        var type = FindTypeByName(typeInfo.FullName);
+
+                        if (type != null &&
+                            type.IsClass &&
+                            !type.IsAbstract &&
+                            viewModelBaseType.IsAssignableFrom(type) &&
+                            type != viewModelBaseType &&
+                            // Exclude examples
+                            !type.Namespace?.StartsWith("UIFramework.Examples") == true)
+                        {
+                            viewModels.Add(type);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[ViewModelRegistryGenerator] Error parsing {filePath}: {ex.Message}");
+                }
+            }
+
+            return viewModels.OrderBy(t => t.FullName).ToList();
+        }
+
+        private class TypeInfo
+        {
+            public string Namespace { get; set; }
+            public string ClassName { get; set; }
+            public string FullName => string.IsNullOrEmpty(Namespace) ? ClassName : $"{Namespace}.{ClassName}";
+        }
+
+        private static List<TypeInfo> ParseViewModelsFromFile(string filePath)
+        {
+            var result = new List<TypeInfo>();
+            var content = File.ReadAllText(filePath);
+
+            // Extract namespace (optional)
+            string currentNamespace = null;
+            var namespaceMatch = System.Text.RegularExpressions.Regex.Match(content, @"namespace\s+([\w\.]+)");
+            if (namespaceMatch.Success)
+            {
+                currentNamespace = namespaceMatch.Groups[1].Value;
+            }
+
+            // Find all class declarations that inherit from ViewModelBase
+            var classMatches = System.Text.RegularExpressions.Regex.Matches(
+                content,
+                @"class\s+(\w+)\s*:\s*\w*ViewModelBase",
+                System.Text.RegularExpressions.RegexOptions.Multiline
+            );
+
+            foreach (System.Text.RegularExpressions.Match match in classMatches)
+            {
+                var className = match.Groups[1].Value;
+                result.Add(new TypeInfo
+                {
+                    Namespace = currentNamespace,
+                    ClassName = className
+                });
+            }
+
+            return result;
+        }
+
+        private static Type FindTypeByName(string fullTypeName)
+        {
+            // Search in all loaded assemblies
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             foreach (var assembly in assemblies)
             {
-                var assemblyName = assembly.GetName().Name;
-
-                // Skip Unity and system assemblies
-                if (ShouldSkipAssembly(assemblyName))
+                // Skip Unity and system assemblies for performance
+                if (ShouldSkipAssembly(assembly.GetName().Name))
                 {
                     continue;
                 }
 
                 try
                 {
-                    var types = assembly.GetTypes()
-                        .Where(t => t.IsClass &&
-                               !t.IsAbstract &&
-                               viewModelBaseType.IsAssignableFrom(t) &&
-                               t != viewModelBaseType &&
-                               // Exclude examples
-                               !t.Namespace?.StartsWith("UIFramework.Examples") == true);
-
-                    viewModels.AddRange(types);
+                    var type = assembly.GetType(fullTypeName);
+                    if (type != null)
+                    {
+                        return type;
+                    }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Debug.LogWarning($"[ViewModelRegistryGenerator] Error scanning {assemblyName}: {ex.Message}");
+                    // Ignore errors in individual assemblies
                 }
             }
 
-            return viewModels.OrderBy(t => t.FullName).ToList();
+            return null;
         }
 
         private static bool ShouldSkipAssembly(string assemblyName)
