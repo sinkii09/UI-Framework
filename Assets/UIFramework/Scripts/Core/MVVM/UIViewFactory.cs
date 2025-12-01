@@ -23,21 +23,21 @@ namespace UIFramework.Core
         /// </summary>
         /// <param name="objectPool">The object pool for reusing views.</param>
         /// <param name="container">The VContainer resolver for dependency injection.</param>
-        /// <param name="uiCanvas">The Canvas where UI views will be instantiated.</param>
-        public UIViewFactory(IUIObjectPool objectPool, IObjectResolver container, Canvas uiCanvas)
+        /// <param name="safeArea">The SafeArea RectTransform where UI views will be instantiated.</param>
+        public UIViewFactory(IUIObjectPool objectPool, IObjectResolver container, RectTransform safeArea)
         {
             _objectPool = objectPool ?? throw new ArgumentNullException(nameof(objectPool));
             _container = container ?? throw new ArgumentNullException(nameof(container));
 
-            if (uiCanvas == null)
+            if (safeArea == null)
             {
-                throw new ArgumentNullException(nameof(uiCanvas),
-                    "UI Canvas is not assigned! " +
-                    "Please assign the Canvas in UIFrameworkInstaller inspector.");
+                throw new ArgumentNullException(nameof(safeArea),
+                    "SafeArea is not assigned! " +
+                    "This should be auto-created by UIFrameworkInstaller.");
             }
 
-            _rootTransform = uiCanvas.transform;
-            Debug.Log($"[UIViewFactory] Using Canvas: {uiCanvas.name}");
+            _rootTransform = safeArea;
+            Debug.Log($"[UIViewFactory] Using SafeArea: {safeArea.name}");
         }
 
         public async Task<TView> CreateAsync<TView, TViewModel>(
@@ -56,7 +56,7 @@ namespace UIFramework.Core
                 // Get view from pool (pool handles prefab loading and instantiation)
                 var viewInstance = await _objectPool.GetAsync<TView>(cancellationToken);
 
-                // Move to canvas and set name
+                // Move to SafeArea and set name
                 viewInstance.transform.SetParent(_rootTransform, false);
                 viewInstance.name = viewType.Name;
 

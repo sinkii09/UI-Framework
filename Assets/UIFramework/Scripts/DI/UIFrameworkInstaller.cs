@@ -19,6 +19,8 @@ namespace UIFramework.DI
     {
         [SerializeField] private UIFrameworkConfig config;
         [SerializeField] private Canvas uiCanvas;
+        
+        private RectTransform safeArea;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -93,9 +95,9 @@ namespace UIFramework.DI
             // Event bus - singleton
             builder.Register<UIEventBus>(Lifetime.Singleton);
 
-            // View factory - singleton (pass Canvas reference from installer)
+            // View factory - singleton (pass SafeArea reference from installer)
             builder.Register<IUIViewFactory, UIViewFactory>(Lifetime.Singleton)
-                .WithParameter(uiCanvas);
+                .WithParameter(safeArea);
         }
 
         private void RegisterNavigationServices(IContainerBuilder builder)
@@ -148,13 +150,32 @@ namespace UIFramework.DI
         /// </summary>
         protected override void Awake()
         {
+            SafeArea safeAreaComponent = uiCanvas.GetComponentInChildren<SafeArea>();
+            if (safeAreaComponent != null)
+            {
+                safeArea = safeAreaComponent.GetComponent<RectTransform>();
+            }
+            else
+            {
+                var safeAreaGO = new GameObject("SafeArea");
+                safeArea = safeAreaGO.AddComponent<RectTransform>();
+                safeArea.SetParent(uiCanvas.transform, false);
+
+                // Set to stretch full canvas
+                safeArea.anchorMin = Vector2.zero;
+                safeArea.anchorMax = Vector2.one;
+                safeArea.offsetMin = Vector2.zero;
+                safeArea.offsetMax = Vector2.zero;
+
+                safeAreaGO.AddComponent<SafeArea>();
+
+                Debug.Log("[UIFrameworkInstaller] Auto-created SafeArea as child of Canvas");
+            }
             base.Awake();
-
-            DontDestroyOnLoad(gameObject);
-
             // Initialize static UIFramework facade
             Core.UIManager.Initialize(Container);
 
+            DontDestroyOnLoad(gameObject);
             uiCanvas.transform.SetParent(transform);
         }
 
